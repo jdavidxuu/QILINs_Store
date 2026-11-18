@@ -1,0 +1,35 @@
+name: Remove images folder
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  remove-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Remove images folder
+        run: |
+          if [ -d "images" ]; then
+            git rm -r -- images/
+          else
+            echo "The images/ folder does not exist."
+          fi
+
+      - name: Commit and push removal
+        run: |
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "Remove uploaded images"
+            git push origin HEAD:main
+          else
+            echo "No tracked images to remove."
+          fi
